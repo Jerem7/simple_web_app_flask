@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title> <!-- blok tytułowy -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% if theme == 'high-contrast' %} <!-- zmiana stylu w zależności od wyboru -->
+        <link href="{{ url_for('static', filename='high_contrast.css') }}" rel="stylesheet">
+    {% else %}
+        <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    {% endif %}<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> <!-- skrypty js -->
+</head>
+<body class="{% if theme == 'high-contrast' %}high-contrast{% endif %}">
+<header class="p-3"> <!-- header strony -->
+    <nav class="navbar navbar-expand-lg">
+        <!-- poniżej przycisk do rozwijania menu -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/main">Strona główna</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/times">Czasy</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gallery">Galeria</a>
+                </li>
+            </ul>
+            <!-- przycisk do zmian stylu -->
+            <button type="button" class="btn btn-warning" id="styleButton">Wysoki Kontrast</button>
+        </div>
+    </nav>
+</header>
+<!-- baner z informacją o ciasteczkach -->
+<div id="cookie-banner" style="display: none; position: fixed; bottom: 0; width: 100%; background-color: #f5f5f5; padding: 10px 0; text-align: center; z-index: 1000;">
+    <p style="margin: 0; padding: 0 10px;">Ta strona wymaga ciasteczek do poprawnego działania. Naciśnij akceptuj aby kontynuować używanie strony</p>
+    <button id="accept-cookies" style="margin-left: 10px; padding: 5px 10px;">Akceptuj</button>
+    <button id="reject-cookies" style="margin-left: 10px; padding: 5px 10px;">Odrzuć</button>
+</div>
+
+<script>
+document.getElementById('styleButton').addEventListener('click', function() { // zmiana stylu strony
+    const currentTheme = document.body.classList.contains('high-contrast') ? 'high-contrast' : 'default';
+    const newTheme = currentTheme === 'default' ? 'high-contrast' : 'default';
+    document.cookie = 'theme=' + newTheme + '; SameSite=Lax; path=/; expires=Fri, 31 Dec 9999 23:59:59 GMT';  // zapisanie wyboru w ciasteczku
+    document.body.classList.toggle('high-contrast');
+    location.reload(); // przeładowanie strony aby zmiany były widoczne
+});
+window.onload = function() {
+    const cookieBanner = document.getElementById('cookie-banner');
+    const acceptCookies = document.getElementById('accept-cookies');
+    const rejectCookies = document.getElementById('reject-cookies');
+
+    if (!getCookie('cookies_accepted')) { // sprawdzenie czy ciasteczka zostały zaakceptowane
+        cookieBanner.style.display = 'block';
+    }
+
+    acceptCookies.onclick = function() { // akceptacja ciasteczek
+        setCookie('cookies_accepted', 'true', 365);
+        cookieBanner.style.display = 'none';
+    };
+
+    rejectCookies.onclick = function() { // odrzucenie ciasteczek
+        window.location.href = 'https://www.google.com';
+    };
+};
+
+function getCookie(name) { // funkcje do obsługi ciasteczek
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
+function setCookie(name, value, days) { // informacje o czasie życia ciasteczka
+    const date = new Date();
+    date.setTime(date.getTime() + (days*24*60*60*1000));
+    const expires = "; expires=" + date.toUTCString();
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+</script>
+
+    <main class="container mt-4"> <!-- główna część strony -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="p-3 mt-4"> <!-- stopka strony -->
+        <p>&copy; J Ż-K, 2024</p>
+    </footer>
+    <!-- skrypty js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

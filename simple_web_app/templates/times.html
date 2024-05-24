@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Czasy{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="mt-5">Czasy</h1>
+        <div class="p-3">
+        <p>Serwerowy czas: {{ server_time }}</p>
+        <p>Loklany czas: <span id="local_time"></span></p>
+        </div>
+    </div>
+    <script>
+        function getLocalTime() { // funkcja zwracająca lokalny czas
+            const now = new Date();
+            return now.toISOString().slice(0, 19).replace('T', ' ');
+        }
+
+        function showLocalTime()  { // funkcja wyświetlająca lokalny czas
+            document.getElementById('local_time').innerHTML = getLocalTime();
+        }
+
+        window.onload = showLocalTime;
+    </script>
+{% endblock %}
